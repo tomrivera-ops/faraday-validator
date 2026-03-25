@@ -2,15 +2,17 @@ import * as fs from "fs";
 import * as path from "path";
 import { validateAuth } from "../validators/authValidator";
 import { validateRLS } from "../validators/rlsValidator";
+import { validateSchema } from "../validators/schemaValidator";
 import { logResult } from "../evidence/logger";
 import { ValidationResult } from "../utils/types";
 
-const validatorMap: Record<string, () => ValidationResult> = {
+const validatorMap: Record<string, () => Promise<ValidationResult>> = {
   auth: validateAuth,
   rls: validateRLS,
+  schema: validateSchema,
 };
 
-export function run(profileName: string) {
+export async function run(profileName: string) {
   const profilePath = path.join(__dirname, "..", "profiles", `${profileName}.json`);
 
   if (!fs.existsSync(profilePath)) {
@@ -29,9 +31,15 @@ export function run(profileName: string) {
       console.error(`Unknown validator: ${name}`);
       continue;
     }
-    const result = validator();
+    const result = await validator();
     logResult(result);
     results.push(result);
+  }
+
+  console.log("\n --- Results ---\n");
+  for (const r of results) {
+    const icon = r.status === "PASS" ? "[PASS]" : "[FAIL]";
+    console.log(`  ${icon} ${r.name}: ${r.message}`);
   }
 
   const allPassed = results.every((r) => r.status === "PASS");
