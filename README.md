@@ -2,6 +2,10 @@
 
 CLI-based deployment validation engine for the Faraday system. Runs live checks against a Supabase instance — verifying auth flows, RLS policies, and schema accessibility — then outputs structured JSON evidence with pass/fail results. Part of the [tomrivera-ops](https://github.com/tomrivera-ops) platform.
 
+## How it fits the system
+
+This is the first real validation phase for FSO. faraday-validator acts as a deployment gatekeeper — it runs against a live Supabase instance to confirm auth, RLS, and schema are correctly configured before a release proceeds. Ensure your `.env` points to the correct project.
+
 ## Quick start
 
 ```bash
