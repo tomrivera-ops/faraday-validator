@@ -1,0 +1,4 @@
+{
+  "name": "fso",
+  "validators": ["auth", "schema", "rls"]
+}
