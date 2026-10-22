@@ -1,0 +1,30 @@
+name: Required checks
+
+# Runs on every PR (no path filter) so it can be a required status check on main
+# without stalling unrelated PRs. Replaces the former 1-approval gate (ADR-0013:
+# the founder is the only required human approver; validation is automated).
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  required-checks:
+    name: required-checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Typecheck (tsc --noEmit, strict)
+        run: npx --no-install tsc --noEmit -p .
